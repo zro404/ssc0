@@ -1,2 +1,3 @@
-# ssc0
-Tiny Selfhosted Scheme Compiler
+# Tiny Selfhosted Scheme Compiler
+
+> WORK IN PROGRESS
