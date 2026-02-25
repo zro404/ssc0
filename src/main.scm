@@ -1,34 +1,36 @@
 (load "src/runtime.scm")
+(load "src/lexer.scm")
 
 (define void-object (cons 'void '()))
 (define (void)
   void-object)
 
-(define outfile (void))
-
 (define (compile-file fpath)
-  (set! outfile (open-output-file (string-append fpath ".as")))
-  (emit runtime-asm)
-  ; TODO compiler logic
+  (display (string-append "Compiling " fpath "\n"))
 
-  ; cleanup
-  (close-output-port outfile)
-  (void)
+  (define tokens '())
+
+  (call-with-input-file fpath (lambda (in-port)
+    (set! tokens (lexer in-port))
+  ))
+
+  ; TODO parser
+
+  (call-with-output-file (string-append fpath ".asm") (lambda (out-port)
+    (emit out-port runtime-asm)
+    ; TODO Codegen output
+  ))
+
+  (display (string-append "Successfully Compiled: " fpath "\n"))
 )
 
-(define (emit asm)
-  (if
-    (eq? outfile (void))
-    ((display "Error: Output file port not initialized!")
-     (newline))
-    (display asm outfile)
-  )
-)
+; (define (read-file fpath)
+;     (let loop ((chars '()))
+;       (let ((ch (read-char in-port)))
+;         (if (eof-object? ch)
+;           (list->string (reverse chars))
+;           (loop (cons ch chars))))))))
 
-; (define (main)
-;   (newline)
-;   (display "Hello, World!")
-;   (newline)
-;   (void))
-;
-; (main)
+(define (emit port asm)
+  (display asm port)
+)
