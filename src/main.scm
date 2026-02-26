@@ -6,19 +6,21 @@
   void-object)
 
 (define (compile-file fpath)
-  (display (string-append "Compiling " fpath "\n"))
-
   (define tokens '())
+
+  (display (string-append "Compiling " fpath "\n"))
 
   (call-with-input-file fpath (lambda (in-port)
     (set! tokens (lexer in-port))
   ))
 
+  (display tokens)(newline) ;DEBUG
+
   ; TODO parser
 
   (call-with-output-file (string-append fpath ".asm") (lambda (out-port)
     (emit out-port runtime-asm)
-    ; TODO Codegen output
+    ; TODO codegen output
   ))
 
   (display (string-append "Successfully Compiled: " fpath "\n"))
