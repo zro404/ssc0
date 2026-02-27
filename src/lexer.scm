@@ -5,8 +5,8 @@
 ; [x] integers (base 10)
 ; [x] quote '
 ; [x] strings
-; [] booleans
-; [] characters
+; [x] booleans
+; [x] characters
 
 (define (make-token type value)
   (list type value))
@@ -41,10 +41,7 @@
                (lex tokens) ; exit loop
                (begin
                  (read-char in-port)
-                 (skip (peek-char in-port)))
-               )
-             )
-           )
+                 (skip (peek-char in-port))))))
 
           ((char=? ch #\()
            (lex (cons (make-token 'LPAREN "(") tokens)))
@@ -61,6 +58,18 @@
                   (read-char in-port)
                   (scan (peek-char in-port) (cons next-ch char-list))))))
 
+          ((char=? ch #\#)
+           (let ((next-ch (read-char in-port)))
+             (cond
+               ((or (char=? next-ch #\t) (char=? next-ch #\f))
+                (lex (cons (make-token 'BOOLEAN next-ch) tokens)))
+               ((char=? next-ch #\\)
+                (let ((final-ch (read-char in-port)))
+                  (if (eof-object? final-ch)
+                    (error "Expected Character Found EOF!")
+                    (lex (cons (make-token 'CHARACTER final-ch) tokens)))))
+               (else (error (string-append "Expected Character/Boolean Found: " (string next-ch)))))))
+
           ((char=? ch #\")
            (let scan ((next-ch (peek-char in-port)) (char-list '()))
               (cond
@@ -71,7 +80,7 @@
                 (read-char in-port)
                 (lex (cons (make-token 'STRING (list->string (reverse char-list))) tokens)))
 
-                     ;; Escape sequence
+              ;; Escape sequences
               ((char=? next-ch #\\)
                 (read-char in-port) ; consume backslash
                 (let ((esc (peek-char in-port)))
