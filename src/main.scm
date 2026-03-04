@@ -6,15 +6,17 @@
   void-object)
 
 (define (compile-file fpath)
-  (define tokens '())
-
   (display (string-append "Compiling " fpath "\n"))
 
   (call-with-input-file fpath (lambda (in-port)
-    (set! tokens (lexer in-port))
+    (let loop ((token (lexer-next-token in-port)))
+      (if (not (eq? token (void)))
+        (begin
+          (display token)(newline) ;DEBUG
+        (loop (lexer-next-token in-port)))
+      )
+    )
   ))
-
-  (display tokens)(newline) ;DEBUG
 
   ; TODO parser
 
@@ -25,13 +27,6 @@
 
   (display (string-append "Successfully Compiled: " fpath "\n"))
 )
-
-; (define (read-file fpath)
-;     (let loop ((chars '()))
-;       (let ((ch (read-char in-port)))
-;         (if (eof-object? ch)
-;           (list->string (reverse chars))
-;           (loop (cons ch chars))))))))
 
 (define (emit port asm)
   (display asm port)

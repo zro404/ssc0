@@ -1,5 +1,5 @@
 # Tiny Selfhosted Scheme Compiler
-Compiles R<sup>5</sup>RS Scheme programs to x86\_64 linux executables
+Compiles Scheme programs (R<sup>5</sup>RS subset) to x86\_64 linux executables
 
 > WORK IN PROGRESS
 
