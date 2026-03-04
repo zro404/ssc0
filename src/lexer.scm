@@ -9,6 +9,7 @@
 ; [x] strings
 ; [x] booleans
 ; [x] characters
+; [ ] quasiquotations
 
 (define (make-token type value)
   (list type value))
@@ -17,7 +18,7 @@
   (car token))
 
 (define (token-value token)
-  (cdr token))
+  (cadr token))
 
 
 (define (delimiter? ch)
@@ -27,18 +28,18 @@
       (eof-object? ch)))
 
 
-(define (lexer-next-token in-port)
+(define (read-token in-port)
   (if (eof-object? (peek-char in-port))
-    (void)
+    (eof-object)
     (let ((ch (read-char in-port)))
       (cond
         ((char-whitespace? ch)
-         (lexer-next-token in-port))
+         (read-token in-port))
 
         ((char=? ch #\;)
          (let skip ((next-ch (peek-char in-port)))
            (if (or (char=? next-ch #\newline) (eof-object? ch))
-             (lexer-next-token in-port) ; exit loop
+             (read-token in-port) ; exit loop
              (begin
                (read-char in-port)
                (skip (peek-char in-port))))))
@@ -47,15 +48,10 @@
          (make-token 'LPAREN "("))
 
         ((char=? ch #\))
-         (make-token 'RPAREN "("))
+         (make-token 'RPAREN ")"))
 
         ((char=? ch #\')
-          (let scan ((next-ch (peek-char in-port)) (char-list '()))
-            (if (delimiter? next-ch)
-              (make-token 'QUOTE (list->string (reverse char-list)))
-              (begin
-                (read-char in-port)
-                (scan (peek-char in-port) (cons next-ch char-list))))))
+         (make-token 'QUOTE "'"))
 
         ((char=? ch #\#)
          (let ((next-ch (read-char in-port)))

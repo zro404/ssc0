@@ -1,24 +1,24 @@
 (load "src/runtime.scm")
-(load "src/lexer.scm")
+(load "src/reader.scm")
 
 (define void-object (cons 'void '()))
 (define (void)
   void-object)
+(define (void? obj)
+  (eq? obj void-object))
 
 (define (compile-file fpath)
   (display (string-append "Compiling " fpath "\n"))
 
   (call-with-input-file fpath (lambda (in-port)
-    (let loop ((token (lexer-next-token in-port)))
-      (if (not (eq? token (void)))
+    (let loop ((expr (read in-port)))
+      (if (not (eof-object? expr))
         (begin
-          (display token)(newline) ;DEBUG
-        (loop (lexer-next-token in-port)))
-      )
-    )
+          (display expr)(newline)
+          (loop (read in-port)))))
   ))
 
-  ; TODO parser
+  ; TODO expander
 
   (call-with-output-file (string-append fpath ".asm") (lambda (out-port)
     (emit out-port runtime-asm)
