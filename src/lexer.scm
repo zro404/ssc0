@@ -10,6 +10,7 @@
 ; [x] booleans
 ; [x] characters
 ; [ ] quasiquotations
+; [ ] pairs
 
 (define (make-token type value)
   (list type value))

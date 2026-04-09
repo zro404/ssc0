@@ -1,5 +1,5 @@
 ; READER:
-;   read port contents and returns an S-Expression
+;   reads port contents and returns an S-Expression
 
 (load "src/lexer.scm")
 
